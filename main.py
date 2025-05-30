@@ -25,6 +25,16 @@ def extract_embed_url(url):
         if youtube_match:
             video_id = youtube_match.group('id')
             return f'https://www.youtube.com/embed/{video_id}'
+        
+        #Handle Twitch URLs manually using regex to extract channel name
+        twitch_match = re.match(
+            r'(https?://)?(www\.)?(twitch\.tv)/(?P<channel>[^/]+)',
+            url
+        )
+        if twitch_match:
+            channel_name = twitch_match.group('channel')
+            return f'https://player.twitch.tv/?channel={channel_name}&parent=localhost'
+
 
         # For non-YouTube URLs, use Playwright to visit and parse page content
         with sync_playwright() as p:
