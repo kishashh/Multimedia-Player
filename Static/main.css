@@ -1,0 +1,186 @@
+/* ==========================
+   Global & Reset Styles
+   ========================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fafafa;
+  color: #222;
+  line-height: 1.5;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ==========================
+   Title Styling
+   ========================== */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center; /* Change this to left/right/center as needed */
+  color: #2c3e50;
+  user-select: none;
+}
+
+/* ==========================
+   Layout Container
+   ========================== */
+/* Main wrapper that holds media list and video grid */
+#layout-container {
+  display: flex;
+  flex-wrap: wrap; /* allow wrapping on small screens */
+  gap: 20px;
+
+  /* Control direction and position */
+  /* Default: media list on left, video grid on right */
+  flex-direction: row;
+  justify-content: center; /* center horizontally */
+  align-items: flex-start;
+}
+
+/* ==========================
+   Media List Container
+   ========================== */
+#media-list {
+  background-color: #fff;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  padding: 15px;
+  width: 300px; /* fixed width for sidebar */
+  max-height: 75vh; /* limit height, allow scroll */
+  overflow-y: auto;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+}
+
+/* ==========================
+   Media List Items
+   ========================== */
+.media-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+  color: #34495e;
+  user-select: text;
+}
+
+.media-item:last-child {
+  border-bottom: none;
+}
+
+.media-item button {
+  background: transparent;
+  border: none;
+  color: #e74c3c;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.media-item button:hover {
+  color: #c0392b;
+}
+
+/* ==========================
+   Video Grid Container
+   ========================== */
+#video-grid {
+  flex: 1 1 600px; /* Grow to fill space, minimum width 600px */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 5px;
+  border-radius: 8px;
+}
+
+/* ==========================
+   Embedded Videos (iframes)
+   ========================== */
+iframe {
+  width: 100%;
+  height: 180px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  background-color: #000;
+}
+
+/* ==========================
+   Responsive Adjustments
+   ========================== */
+@media (max-width: 900px) {
+  #layout-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #media-list {
+    width: 100%;
+    max-height: 200px;
+    overflow-x: auto;
+    border-radius: 0;
+    margin-bottom: 15px;
+  }
+
+  #video-grid {
+    max-height: none;
+    width: 100%;
+  }
+
+  iframe {
+    height: 220px;
+  }
+}
+
+/* ==========================
+   Utility Classes
+   ========================== */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================
+   Layout Variation Examples
+   ========================== */
+
+/* Media list on the right */
+.layout-list-right #layout-container {
+  flex-direction: row-reverse;
+}
+
+/* Media list on the top */
+.layout-list-top #layout-container {
+  flex-direction: column;
+}
+
+.layout-list-top #media-list {
+  width: 100%;
+  max-height: 150px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+/* Media list on the bottom */
+.layout-list-bottom #layout-container {
+  flex-direction: column-reverse;
+}
+
+.layout-list-bottom #media-list {
+  width: 100%;
+  max-height: 150px;
+  margin-top: 20px;
+  overflow-x: auto;
+}

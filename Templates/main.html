@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live Multi-Stream Viewer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body class="layout-list-left">
+  <h1>Live Multi-Stream Viewer</h1>
+
+  <!-- Input and button -->
+  <div style="text-align: center; margin-bottom: 10px;">
+    <input type="text" id="url-input" placeholder="Enter media URL" />
+    <button onclick="addMedia()">Add Media</button>
+  </div>
+
+  <!-- Layout container controls placement -->
+  <div id="layout-container">
+    <!-- Media list -->
+    <div id="media-list">
+      <!-- Links with remove buttons will appear here -->
+    </div>
+
+    <!-- Video grid -->
+    <div id="video-grid">
+      <!-- Embedded video iframes go here -->
+    </div>
+  </div>
+
+  <script>
+    let mediaIdCounter = 0;
+
+    async function addMedia() {
+      const input = document.getElementById('url-input');
+      const url = input.value.trim();
+      if (!url) return;
+
+      try {
+        const res = await fetch('/embed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        const data = await res.json();
+        if (data.embed_url) {
+          const id = `media-${mediaIdCounter++}`;
+
+          // Add iframe
+          const iframe = document.createElement('iframe');
+          iframe.src = data.embed_url;
+          iframe.frameBorder = 0;
+          iframe.allowFullscreen = true;
+          iframe.id = id;
+          document.getElementById('video-grid').appendChild(iframe);
+
+          // Add link + remove button
+          const listItem = document.createElement('div');
+          listItem.className = 'media-item';
+          listItem.id = `item-${id}`;
+          listItem.innerHTML = `
+            <span>${url}</span>
+            <button onclick="removeMedia('${id}')">❌</button>
+          `;
+          document.getElementById('media-list').appendChild(listItem);
+
+          input.value = '';
+        } else {
+          alert(data.error || 'Could not extract embedded media.');
+        }
+      } catch (err) {
+        alert('Error extracting media');
+        console.error(err);
+      }
+    }
+
+    function removeMedia(id) {
+      const iframe = document.getElementById(id);
+      if (iframe) iframe.remove();
+
+      const listItem = document.getElementById(`item-${id}`);
+      if (listItem) listItem.remove();
+    }
+  </script>
+</body>
+</html>
