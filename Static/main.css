@@ -1,20 +1,18 @@
-/*
-TODO: for this and HTML make prettier
-*/
-
 /* ==========================
    Global & Reset Styles
    ========================== */
+/* Reset box model and remove default spacing */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Set body styling */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #fafafa;
-  color: #222;
+  background-color: #222526; /* Dark theme background */
+  color: #e0e0e0; /* Light gray text */
   line-height: 1.5;
   padding: 20px;
   display: flex;
@@ -25,63 +23,74 @@ body {
 /* ==========================
    Title Styling
    ========================== */
+/* Centered green header */
 h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  text-align: center; /* Change this to left/right/center as needed */
-  color: #2c3e50;
+  text-align: center;
+  color: #009614;
   user-select: none;
 }
 
 /* ==========================
    Layout Container
    ========================== */
-/* Main wrapper that holds media list and video grid */
+/* Main container for the sidebar and video grid */
 #layout-container {
   display: flex;
   flex-wrap: wrap; /* allow wrapping on small screens */
   gap: 20px;
-
-  /* Control direction and position */
-  /* Default: media list on left, video grid on right */
   flex-direction: row;
   justify-content: center; /* center horizontally */
   align-items: flex-start;
 }
 
 /* ==========================
-   Media List Container
+   Media List Sidebar
    ========================== */
+/* Left sidebar to hold video URLs and controls */
 #media-list {
-  background-color: #fff;
-  border: 2px solid #3498db;
+  background-color: #474747;
+  border: 2px solid #0088228e; /* Green-tinted border */
   border-radius: 8px;
-  padding: 15px;
   width: 300px; /* fixed width for sidebar */
   max-height: 75vh; /* limit height, allow scroll */
+  max-height: 75vh;
   overflow-y: auto;
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+  box-shadow: 0 10px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ==========================
-   Media List Items
+   Media List Items (links)
    ========================== */
+/* Each media item: URL and remove button */
 .media-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #444;
   font-size: 0.9rem;
-  color: #34495e;
+  color: #ffffff;
   user-select: text;
+  gap: 10px;
 }
 
 .media-item:last-child {
   border-bottom: none;
 }
 
+/* Truncate long URLs */
+.media-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  display: inline-block;
+}
+
+/* Red "remove" button */
 .media-item button {
   background: transparent;
   border: none;
@@ -93,44 +102,58 @@ h1 {
 }
 
 .media-item button:hover {
-  color: #c0392b;
+  color: #ff6b5a;
 }
 
 /* ==========================
    Video Grid Container
    ========================== */
+/* Right side grid for displaying embedded videos */
 #video-grid {
   flex: 1 1 600px; /* Grow to fill space, minimum width 600px */
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
-  max-height: 75vh;
+  height: 100%;
   overflow-y: auto;
   padding: 5px;
   border-radius: 8px;
 }
 
 /* ==========================
-   Embedded Videos (iframes)
+   Responsive Video Embeds
    ========================== */
-iframe {
+/* Wrapper maintains 16:9 aspect ratio */
+.video-wrapper {
+  position: relative;
   width: 100%;
-  height: 180px;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+/* Embedded iframe takes full space inside wrapper */
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10%; /* NOTE: This may need to be 100% to fill wrapper */
+  height: 100%;
+  border: 1px solid #555;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-  background-color: #000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  background-color: #ffffff;
 }
 
 /* ==========================
    Responsive Adjustments
    ========================== */
+/* For smaller screens, stack layout vertically */
 @media (max-width: 900px) {
   #layout-container {
     flex-direction: column;
     align-items: center;
   }
 
+  /* Full-width sidebar on small screens */
   #media-list {
     width: 100%;
     max-height: 200px;
@@ -139,19 +162,36 @@ iframe {
     margin-bottom: 15px;
   }
 
+  /* Space below add-controls in sidebar */
+  #media-list > div:first-child {
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  /* Margin for Add button on mobile */
+  #media-list button {
+    margin-right: 5px;
+  }
+
+  /* Video grid takes full width on small screens */
   #video-grid {
     max-height: none;
     width: 100%;
   }
 
-  iframe {
-    height: 220px;
+  .video-wrapper {
+    padding-top: 56.25%;
+  }
+
+  .video-wrapper iframe {
+    height: 100%;
   }
 }
 
 /* ==========================
    Utility Classes
    ========================== */
+/* Hide element visually but keep it in DOM */
 .hidden {
   display: none !important;
 }
@@ -159,13 +199,12 @@ iframe {
 /* ==========================
    Layout Variation Examples
    ========================== */
-
-/* Media list on the right */
+/* List on the right instead of left */
 .layout-list-right #layout-container {
   flex-direction: row-reverse;
 }
 
-/* Media list on the top */
+/* List on top */
 .layout-list-top #layout-container {
   flex-direction: column;
 }
@@ -177,7 +216,7 @@ iframe {
   overflow-x: auto;
 }
 
-/* Media list on the bottom */
+/* List on bottom */
 .layout-list-bottom #layout-container {
   flex-direction: column-reverse;
 }
@@ -187,4 +226,27 @@ iframe {
   max-height: 150px;
   margin-top: 20px;
   overflow-x: auto;
+}
+
+/* ==========================
+   Responsive Video Embeds
+   ========================== */
+/* Wrapper maintains 16:9 aspect ratio */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+}
+
+/* Iframe fills the wrapper space responsively */
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;  /* Fixed from 10% to 100% */
+  height: 100%;
+  border-radius: 6px;
+  border: 1px solid #555;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  background-color: #ffffff;
 }

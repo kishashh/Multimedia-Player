@@ -1,33 +1,29 @@
-<!--
-TODO: for this and CSS make prettier
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Live Multi-Stream Viewer</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
 </head>
 <body class="layout-list-left">
   <h1>Live Multi-Stream Viewer</h1>
-
-  <!-- Input and button -->
-  <div style="text-align: center; margin-bottom: 10px;">
-    <input type="text" id="url-input" placeholder="Enter media URL" />
-    <button onclick="addMedia()">Add Media</button>
-  </div>
 
   <!-- Layout container controls placement -->
   <div id="layout-container">
     <!-- Media list -->
     <div id="media-list">
+      <!-- Move input and button here -->
+      <div style="text-align: center; margin-bottom: 10px;">
+        <button onclick="addMedia()">Add Media</button>
+        <input type="text" id="url-input" placeholder="Enter URL here" />
+      </div>
+
       <!-- Links with remove buttons will appear here -->
     </div>
 
     <!-- Video grid -->
     <div id="video-grid">
-      <!-- Embedded video iframes go here -->
+      <!-- Embedded video wrappers go here -->
     </div>
   </div>
 
@@ -50,13 +46,16 @@ TODO: for this and CSS make prettier
         if (data.embed_url) {
           const id = `media-${mediaIdCounter++}`;
 
-          // Add iframe
+          // Add iframe inside a wrapper
+          const wrapper = document.createElement('div');
+          wrapper.className = 'video-wrapper';
           const iframe = document.createElement('iframe');
           iframe.src = data.embed_url;
           iframe.frameBorder = 0;
           iframe.allowFullscreen = true;
           iframe.id = id;
-          document.getElementById('video-grid').appendChild(iframe);
+          wrapper.appendChild(iframe);
+          document.getElementById('video-grid').appendChild(wrapper);
 
           // Add link + remove button
           const listItem = document.createElement('div');
@@ -80,7 +79,7 @@ TODO: for this and CSS make prettier
 
     function removeMedia(id) {
       const iframe = document.getElementById(id);
-      if (iframe) iframe.remove();
+      if (iframe) iframe.parentElement.remove();
 
       const listItem = document.getElementById(`item-${id}`);
       if (listItem) listItem.remove();
