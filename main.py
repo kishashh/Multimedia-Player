@@ -34,6 +34,9 @@ def extract_embed_url(url):
             page.wait_for_timeout(4000)  # Allow JavaScript to load content
 
             # Attempt to find the first iframe tag and return its src
+
+            # TODO: Make this able to be used on other sites that dont have iframe src in the first iteration of iframe.
+            # TODO: Make faster (Pref as fast as YouTube works)
             iframe = page.query_selector('iframe')
             if iframe:
                 src = iframe.get_attribute('src')
