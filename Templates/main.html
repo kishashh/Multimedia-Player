@@ -30,6 +30,7 @@
   <script>
     let mediaIdCounter = 0;
 
+    // Add Media Button handler
     async function addMedia() {
       const input = document.getElementById('url-input');
       const url = input.value.trim();
@@ -63,11 +64,13 @@
           listItem.id = `item-${id}`;
           listItem.innerHTML = `
             <span>${url}</span>
-            <button onclick="removeMedia('${id}')">❌</button>
+            <button onclick="removeMedia('${id}')">X</button>
           `;
           document.getElementById('media-list').appendChild(listItem);
 
           input.value = '';
+
+          updateGridColumns(); // Update grid layout
         } else {
           alert(data.error || 'Could not extract embedded media.');
         }
@@ -77,13 +80,25 @@
       }
     }
 
+    // Remove Media Button handler
     function removeMedia(id) {
       const iframe = document.getElementById(id);
       if (iframe) iframe.parentElement.remove();
 
       const listItem = document.getElementById(`item-${id}`);
       if (listItem) listItem.remove();
+
+      updateGridColumns(); // Update grid layout
     }
+
+    // Auto-calculate the grid size
+    function updateGridColumns() {
+      const grid = document.getElementById('video-grid');
+      const count = grid.querySelectorAll('.video-wrapper').length;
+      const cols = Math.ceil(Math.sqrt(count)) || 1;
+      grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    }
+  
   </script>
 </body>
 </html>
