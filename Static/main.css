@@ -14,7 +14,7 @@ body {
   background-color: #222526; /* Dark theme background */
   color: #e0e0e0; /* Light gray text */
   line-height: 1.5;
-  padding: 20px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -25,9 +25,9 @@ body {
    ========================== */
 /* Centered green header */
 h1 {
-  font-size: 2.5rem;
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 5px;
   text-align: center;
   color: #009614;
   user-select: none;
@@ -38,16 +38,22 @@ h1 {
    ========================== */
 /* Main container for the sidebar and video grid */
 #layout-container {
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-wrap: wrap; /* allow wrapping on small screens */
-  gap: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  max-width: 98.5vw; /* Prevent horizontal overflow */
+  box-sizing: border-box; /* Ensure padding is included in total width */
+  gap: 15px;
   flex-direction: row;
   justify-content: center; /* center horizontally */
   align-items: flex-start;
 }
 
 /* ==========================
-   Media List Sidebar
+   Media List (Box)
    ========================== */
 /* Left sidebar to hold video URLs and controls */
 #media-list {
@@ -56,7 +62,6 @@ h1 {
   border-radius: 8px;
   width: 300px; /* fixed width for sidebar */
   max-height: 75vh; /* limit height, allow scroll */
-  max-height: 75vh;
   overflow-y: auto;
   box-shadow: 0 10px 8px rgba(0, 0, 0, 0.4);
 }
@@ -70,7 +75,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid #00000052;
   font-size: 0.9rem;
   color: #ffffff;
   user-select: text;
@@ -94,8 +99,8 @@ h1 {
 .media-item button {
   background: transparent;
   border: none;
-  color: #e74c3c;
-  font-size: 1.2rem;
+  color: #ff1900;
+  font-size: 19px;
   cursor: pointer;
   transition: color 0.2s ease;
   user-select: none;
@@ -112,7 +117,6 @@ h1 {
 #video-grid {
   flex: 1 1 600px; /* Grow to fill space, minimum width 600px */
   display: grid;
-  /* grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); */
   gap: 5px;
   height: 100%;
   overflow-y: auto;
@@ -178,14 +182,6 @@ h1 {
     max-height: none;
     width: 100%;
   }
-
-  .video-wrapper {
-    padding-top: 56.25%;
-  }
-
-  .video-wrapper iframe {
-    height: 100%;
-  }
 }
 
 /* ==========================
@@ -194,59 +190,4 @@ h1 {
 /* Hide element visually but keep it in DOM */
 .hidden {
   display: none !important;
-}
-
-/* ==========================
-   Layout Variation Examples
-   ========================== */
-/* List on the right instead of left */
-.layout-list-right #layout-container {
-  flex-direction: row-reverse;
-}
-
-/* List on top */
-.layout-list-top #layout-container {
-  flex-direction: column;
-}
-
-.layout-list-top #media-list {
-  width: 100%;
-  max-height: 150px;
-  margin-bottom: 20px;
-  overflow-x: auto;
-}
-
-/* List on bottom */
-.layout-list-bottom #layout-container {
-  flex-direction: column-reverse;
-}
-
-.layout-list-bottom #media-list {
-  width: 100%;
-  max-height: 150px;
-  margin-top: 20px;
-  overflow-x: auto;
-}
-
-/* ==========================
-   Responsive Video Embeds
-   ========================== */
-/* Wrapper maintains 16:9 aspect ratio */
-.video-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
-}
-
-/* Iframe fills the wrapper space responsively */
-.video-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;  /* Fixed from 10% to 100% */
-  height: 100%;
-  border-radius: 6px;
-  border: 1px solid #555;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  background-color: #ffffff;
 }
