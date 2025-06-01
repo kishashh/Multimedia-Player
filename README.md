@@ -9,6 +9,7 @@ Install Commands:
 playwright install
 
 Local Setup:
+0) fork main repo
 1) install dependencies
 2) execute command "playwright install"
 3) run main.py
