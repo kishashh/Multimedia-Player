@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, session, request, jsonify
 from playwright.sync_api import sync_playwright
-import re
+import re, secrets
+
+FLAG = '################'
 
 app = Flask(__name__)
+
+# unsafe approach, need to use environment variables for a safe public deployment
+app.secret_key = 'secret'       # secrets.token_hex(32)
 
 def extract_embed_url(url):
     # Attempts to extract an embeddable video URL from the provided page URL.
@@ -68,11 +73,11 @@ def extract_embed_url(url):
 
     return None
 
-
 @app.route('/')
 def index():
     # Serves the main HTML page that allows users to input media URLs
-    # and view them in an embedded multi-stream viewer.
+    # and view them in an embedded multi-stream viewer persistently.
+    
     return render_template('main.html')
 
 
@@ -85,18 +90,39 @@ def get_embed():
     # Returns:
     #     JSON: { "embed_url": "https://..." } on success
     #           { "error": "..." } on failure
+    print(FLAG, 'In get_embed', FLAG)
+    print(app.secret_key)
     url = request.json.get('url')
     if not url:
         return jsonify({'error': 'No URL provided'}), 400
 
     embed_url = extract_embed_url(url.strip())
     if embed_url:
+        print(FLAG)
         print(embed_url)  # Log for debugging
+        print(FLAG)
+
+        # Creating 'embeds' in session dictionary
+        if 'embeds' not in session:
+            session['embeds'] = []
+
+        # Initializing embeds from session embeds
+        embeds = session['embeds']
+        embeds.append(embed_url)
+        session['embeds'] = embeds
+
+        print("Session contains:", session['embeds'])
+
         return jsonify({'embed_url': embed_url})
     else:
         return jsonify({'error': 'Could not extract embed URL'}), 400
 
-
+@app.route('/embed', methods=['GET'])
+def get_embeds():
+    print(FLAG, 'In get_embeds', FLAG)
+    embeds = session.get('embeds', [])
+    return jsonify({'embeds': embeds})
+    
 if __name__ == '__main__':
     # Start the Flask development server with debug mode enabled
     app.run(debug=True)

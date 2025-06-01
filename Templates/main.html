@@ -30,6 +30,37 @@
   <script>
     let mediaIdCounter = 0;
 
+    window.onload = () => {
+      fetchEmbeds();
+    };
+
+    function renderEmbed(embedUrl, sourceUrl = '') {
+      const id = `media-${mediaIdCounter++}`;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'video-wrapper';
+
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.frameBorder = 0;
+      iframe.allowFullscreen = true;
+      iframe.id = id;
+
+      wrapper.appendChild(iframe);
+      document.getElementById('video-grid').appendChild(wrapper);
+
+      const listItem = document.createElement('div');
+      listItem.className = 'media-item';
+      listItem.id = `item-${id}`;
+      listItem.innerHTML = `
+        <span>${sourceUrl || embedUrl}</span>
+        <button onclick="removeMedia('${id}')">X</button>
+      `;
+      document.getElementById('media-list').appendChild(listItem);
+
+      updateGridColumns();
+    }
+
     // Add Media Button handler
     async function addMedia() {
       const input = document.getElementById('url-input');
@@ -37,47 +68,33 @@
       if (!url) return;
 
       try {
-        const res = await fetch('/embed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url }),
-        });
+    const res = await fetch('/embed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
 
-        const data = await res.json();
-        if (data.embed_url) {
-          const id = `media-${mediaIdCounter++}`;
+    const data = await res.json();
+    if (data.embed_url) {
+      renderEmbed(data.embed_url, url);
+      input.value = '';
+    } else {
+      alert(data.error || 'Could not extract embedded media.');
+    }
+  } catch (err) {
+    alert('Error extracting media');
+    console.error(err);
+  }
+    }
 
-          // Add iframe inside a wrapper
-          const wrapper = document.createElement('div');
-          wrapper.className = 'video-wrapper';
-          const iframe = document.createElement('iframe');
-          iframe.src = data.embed_url;
-          iframe.frameBorder = 0;
-          iframe.allowFullscreen = true;
-          iframe.id = id;
-          wrapper.appendChild(iframe);
-          document.getElementById('video-grid').appendChild(wrapper);
+    // Fetch Embeds to persistently store data *** NEEDS DATABASE FOR A LARGE AMOUNT OF EMBEDS ***
+    async function fetchEmbeds() {
+      const res = await fetch('/embed');
+      const data = await res.json();
+      if (!data.embeds) return;
 
-          // Add link + remove button
-          const listItem = document.createElement('div');
-          listItem.className = 'media-item';
-          listItem.id = `item-${id}`;
-          listItem.innerHTML = `
-            <span>${url}</span>
-            <button onclick="removeMedia('${id}')">X</button>
-          `;
-          document.getElementById('media-list').appendChild(listItem);
-
-          input.value = '';
-
-          updateGridColumns(); // Update grid layout
-        } else {
-          alert(data.error || 'Could not extract embedded media.');
-        }
-      } catch (err) {
-        alert('Error extracting media');
-        console.error(err);
-      }
+      // Adds each url back from the stored embeds
+      data.embeds.forEach(embedUrl => renderEmbed(embedUrl));
     }
 
     // Remove Media Button handler
