@@ -30,9 +30,7 @@
   <script>
     let mediaIdCounter = 0;
 
-    window.onload = () => {
-      fetchEmbeds();
-    };
+    window.onload = fetchEmbeds();
 
     function renderEmbed(embedUrl, sourceUrl = '') {
       const id = `media-${mediaIdCounter++}`;
@@ -54,7 +52,7 @@
       listItem.id = `item-${id}`;
       listItem.innerHTML = `
         <span>${sourceUrl || embedUrl}</span>
-        <button onclick="removeMedia('${id}')">X</button>
+        <button onclick="removeMedia('${id}', '${embedUrl}')">X</button>
       `;
       document.getElementById('media-list').appendChild(listItem);
 
@@ -66,25 +64,23 @@
       const input = document.getElementById('url-input');
       const url = input.value.trim();
       if (!url) return;
-
       try {
-    const res = await fetch('/embed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    });
-
-    const data = await res.json();
-    if (data.embed_url) {
-      renderEmbed(data.embed_url, url);
-      input.value = '';
-    } else {
-      alert(data.error || 'Could not extract embedded media.');
-    }
-  } catch (err) {
-    alert('Error extracting media');
-    console.error(err);
-  }
+        const res = await fetch('/embed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+        if (data.embed_url) {
+          renderEmbed(data.embed_url, url);
+          input.value = '';
+        } else {
+          alert(data.error || 'Could not extract embedded media.');
+        }
+      } catch (err) {
+        alert('Error extracting media');
+        console.error(err);
+      }
     }
 
     // Fetch Embeds to persistently store data *** NEEDS DATABASE FOR A LARGE AMOUNT OF EMBEDS ***
@@ -98,14 +94,24 @@
     }
 
     // Remove Media Button handler
-    function removeMedia(id) {
+    async function removeMedia(id, embedUrl) {
       const iframe = document.getElementById(id);
       if (iframe) iframe.parentElement.remove();
 
       const listItem = document.getElementById(`item-${id}`);
       if (listItem) listItem.remove();
 
-      updateGridColumns(); // Update grid layout
+      updateGridColumns();
+
+      try {
+        await fetch('/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ embed_url: embedUrl })
+        });
+      } catch (err) {
+        console.error('Error removing from session:', err);
+      }
     }
 
     // Auto-calculate the grid size

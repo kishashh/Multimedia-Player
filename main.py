@@ -102,14 +102,7 @@ def get_embed():
         print(embed_url)  # Log for debugging
         print(FLAG)
 
-        # Creating 'embeds' in session dictionary
-        if 'embeds' not in session:
-            session['embeds'] = []
-
-        # Initializing embeds from session embeds
-        embeds = session['embeds']
-        embeds.append(embed_url)
-        session['embeds'] = embeds
+        update_embeds(embed_url)
 
         print("Session contains:", session['embeds'])
 
@@ -119,10 +112,36 @@ def get_embed():
 
 @app.route('/embed', methods=['GET'])
 def get_embeds():
-    print(FLAG, 'In get_embeds', FLAG)
+    # print(FLAG, 'In get_embeds', FLAG)
     embeds = session.get('embeds', [])
     return jsonify({'embeds': embeds})
     
+def update_embeds(embed_url):
+    # Creating 'embeds' in session dictionary
+    if 'embeds' not in session:
+        session['embeds'] = []
+
+    # Initializing embeds from session embeds
+    embeds = session['embeds']
+    embeds.append(embed_url)
+    session['embeds'] = embeds
+
+@app.route('/remove', methods=['POST'])
+def remove_embed():
+    # print(FLAG, 'In remove Embeds', FLAG)
+    data = request.get_json()
+    embed_url = data.get('embed_url')
+    if not embed_url:
+        return jsonify({'error': 'No URL Provided'}), 400
+    
+    embeds = session.get('embeds', [])
+    if embed_url in embeds:
+        embeds.remove(embed_url)
+        session['embeds'] = embeds
+        return jsonify({'success': True})
+    else:
+        return jsonify({'error': 'Embed not found'}), 404
+
 if __name__ == '__main__':
     # Start the Flask development server with debug mode enabled
     app.run(debug=True)
