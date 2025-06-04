@@ -22,55 +22,47 @@ def extract_embed_url(url):
     # Returns:
     #     str | None: A direct embeddable URL if found, else None
     try:
-        # Handle YouTube URLs manually using regex to extract video ID
-        youtube_match = re.match(
-            r'(https?://)?(www\.)?(youtube\.com|youtu\.be)/(watch\?v=|embed/|live/)?(?P<id>[a-zA-Z0-9_-]{11})',
-            url
-        )
+        # Handle YouTube and Twitch URLs manually using regex to extract video ID
+        youtube_match = re.match(r'(https?://)?(www\.)?(youtube\.com|youtu\.be)/(watch\?v=|embed/|live/)?(?P<id>[a-zA-Z0-9_-]{11})', url)
+        twitch_match = re.match(r'(https?://)?(www\.)?(twitch\.tv)/(?P<channel>[^/]+)', url)
+
         if youtube_match:
             video_id = youtube_match.group('id')
             return f'https://www.youtube.com/embed/{video_id}'
-        
-        #Handle Twitch URLs manually using regex to extract channel name
-        twitch_match = re.match(
-            r'(https?://)?(www\.)?(twitch\.tv)/(?P<channel>[^/]+)',
-            url
-        )
-        if twitch_match:
+        elif twitch_match:
             channel_name = twitch_match.group('channel')
             return f'https://player.twitch.tv/?channel={channel_name}&parent=localhost'
+        else:
+            # For non-YouTube URLs, use Playwright to visit and parse page content
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                print(FLAG, browser, FLAG)
+                page = browser.new_page()
+                page.goto(url, timeout=15000)
+                page.wait_for_timeout(4000)  # Allow JavaScript to load content
 
+                # Attempt to find the first iframe tag and return its src
 
-        # For non-YouTube URLs, use Playwright to visit and parse page content
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            page.goto(url, timeout=15000)
-            page.wait_for_timeout(4000)  # Allow JavaScript to load content
+                # TODO: Make this able to be used on other sites that dont have iframe src in the first iteration of iframe.
+                # TODO: Make faster (Pref as fast as YouTube works)
+                iframe = page.query_selector('iframe')
+                if iframe:
+                    src = iframe.get_attribute('src')
+                    if src:
+                        browser.close()
+                        return src
 
-            # Attempt to find the first iframe tag and return its src
+                # Attempt to find og:video meta tag
+                og_video = page.query_selector('meta[property="og:video"]')
+                if og_video:
+                    content = og_video.get_attribute('content')
+                    if content:
+                        browser.close()
+                        return content
 
-            # TODO: Make this able to be used on other sites that dont have iframe src in the first iteration of iframe.
-            # TODO: Make faster (Pref as fast as YouTube works)
-            iframe = page.query_selector('iframe')
-            if iframe:
-                src = iframe.get_attribute('src')
-                if src:
-                    browser.close()
-                    return src
-
-            # Attempt to find og:video meta tag
-            og_video = page.query_selector('meta[property="og:video"]')
-            if og_video:
-                content = og_video.get_attribute('content')
-                if content:
-                    browser.close()
-                    return content
-
-            browser.close()
+                browser.close()
     except Exception as e:
         print(f"[ERROR] While extracting from {url}: {e}")
-
     return None
 
 @app.route('/')
@@ -91,16 +83,13 @@ def get_embed():
     #     JSON: { "embed_url": "https://..." } on success
     #           { "error": "..." } on failure
     print(FLAG, 'In get_embed', FLAG)
-    print(app.secret_key)
     url = request.json.get('url')
     if not url:
         return jsonify({'error': 'No URL provided'}), 400
 
     embed_url = extract_embed_url(url.strip())
     if embed_url:
-        print(FLAG)
-        print(embed_url)  # Log for debugging
-        print(FLAG)
+        print(FLAG, 'embed url:', embed_url, FLAG)
 
         update_embeds(embed_url)
 
