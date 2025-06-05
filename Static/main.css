@@ -2,6 +2,9 @@
    Global & Reset Styles
    ========================== */
 /* Reset box model and remove default spacing */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Orbitron:wght@400..900&display=swap');
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -10,7 +13,11 @@
 
 /* Set body styling */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+  font-family: "Orbitron", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
   background-color: #222526; /* Dark theme background */
   color: #e0e0e0; /* Light gray text */
   line-height: 1.5;
@@ -25,11 +32,14 @@ body {
    ========================== */
 /* Centered green header */
 h1 {
+  font-family: "Audiowide", sans-serif;
+  /* font-weight: 400; */
+  font-style: normal;
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 500;
   margin-bottom: 5px;
-  text-align: center;
-  color: #009614;
+  text-align: Center;
+  color: #FFF;
   user-select: none;
 }
 
@@ -102,7 +112,7 @@ h1 {
   color: #ff1900;
   font-size: 19px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color .2s ease;
   user-select: none;
 }
 
@@ -118,27 +128,21 @@ h1 {
   flex: 1 1 600px; /* Grow to fill space, minimum width 600px */
   display: grid;
   gap: 5px;
-  height: 100%;
-  overflow-y: auto;
-  padding: 5px;
-  border-radius: 5px;
 }
+
 
 /* ==========================
    Responsive Video Embeds
    ========================== */
-/* Wrapper maintains 16:9 aspect ratio */
 .video-wrapper {
   position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
+  padding-top: 56.25%; /*16:9 aspect ratio */
 }
 
 /* Embedded iframe takes full space inside wrapper */
 .video-wrapper iframe {
   position: absolute;
   top: 0;
-  left: 0;
   width: 100%; /* NOTE: This may need to be 100% to fill wrapper */
   height: 100%;
   border: 1px solid #555;
