@@ -47,31 +47,21 @@ def extract_embed_url(url):
                 iframes = page.query_selector_all('iframe')
                 # print(f"Found {len(iframes)} iframes on the page.")
 
-                for n in range(len(iframes)):
-                    print('Checking iframe at index:', n)
-                    if iframes[n].get_attribute('width') == '100%' and iframes[n].get_attribute('height') == '100%':
-                        # print('Found embed at index: n')
-                        iframe = iframes[n] if iframes else None
-                        if iframe:
-                            src = iframe.get_attribute('src')
-                            if src:
-                                print('src:', src)
-                                browser.close()
-                                return src
-                            break
-                    else:
-                        # print('Skipping iframe at index:', n)
-                        continue
-                
-                # OLD CODE
-                # iframe = iframes[n] if iframes else None
-                # if iframe:
-                #     src = iframe.get_attribute('src')
-                #     if src:
-                #         browser.close()
-                #         return src
 
-                # Attempt to find og:video meta tag
+                for iframe in iframes:
+                    src = iframe.get_attribute('src')
+                    if not src or not src.startswith("http"):
+                        continue
+
+                    src_lower = src.lower()
+
+                    # Must contain keywords that strongly indicate a video embed
+                    if any(kw in src_lower for kw in ("embed", "video", "player")):
+                        # Avoid common non-video iframe patterns
+                        if not any(bad in src_lower for bad in ("ads", "analytics", "widget", "facebook.com/plugins", "tracker", "consent")):
+                            browser.close()
+                            return src
+
                 og_video = page.query_selector('meta[property="og:video"]')
                 if og_video:
                     content = og_video.get_attribute('content')
