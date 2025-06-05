@@ -36,10 +36,9 @@ def extract_embed_url(url):
             # For non-YouTube URLs, use Playwright to visit and parse page content
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
-                print(FLAG, browser, FLAG)
                 page = browser.new_page()
-                page.goto(url)
-                # page.wait_for_timeout(4000)  # Allow JavaScript to load content
+                page.goto(url, timeout=5000, wait_until='domcontentloaded')
+                page.wait_for_timeout(2000)  # Allow JavaScript to load content
 
                 # Attempt to find the first iframe tag and return its src
 
@@ -49,13 +48,14 @@ def extract_embed_url(url):
                 # print(f"Found {len(iframes)} iframes on the page.")
 
                 for n in range(len(iframes)):
-                    # print('Checking iframe at index:', n)
+                    print('Checking iframe at index:', n)
                     if iframes[n].get_attribute('width') == '100%' and iframes[n].get_attribute('height') == '100%':
-                        # print('Found embed at index: 1')
+                        # print('Found embed at index: n')
                         iframe = iframes[n] if iframes else None
                         if iframe:
                             src = iframe.get_attribute('src')
                             if src:
+                                print('src:', src)
                                 browser.close()
                                 return src
                             break
