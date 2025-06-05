@@ -38,19 +38,38 @@ def extract_embed_url(url):
                 browser = p.chromium.launch(headless=True)
                 print(FLAG, browser, FLAG)
                 page = browser.new_page()
-                page.goto(url, timeout=15000)
-                page.wait_for_timeout(4000)  # Allow JavaScript to load content
+                page.goto(url)
+                # page.wait_for_timeout(4000)  # Allow JavaScript to load content
 
                 # Attempt to find the first iframe tag and return its src
 
                 # TODO: Make this able to be used on other sites that dont have iframe src in the first iteration of iframe.
                 # TODO: Make faster (Pref as fast as YouTube works)
-                iframe = page.query_selector('iframe')
-                if iframe:
-                    src = iframe.get_attribute('src')
-                    if src:
-                        browser.close()
-                        return src
+                iframes = page.query_selector_all('iframe')
+                # print(f"Found {len(iframes)} iframes on the page.")
+
+                for n in range(len(iframes)):
+                    # print('Checking iframe at index:', n)
+                    if iframes[n].get_attribute('width') == '100%' and iframes[n].get_attribute('height') == '100%':
+                        # print('Found embed at index: 1')
+                        iframe = iframes[n] if iframes else None
+                        if iframe:
+                            src = iframe.get_attribute('src')
+                            if src:
+                                browser.close()
+                                return src
+                            break
+                    else:
+                        # print('Skipping iframe at index:', n)
+                        continue
+                
+                # OLD CODE
+                # iframe = iframes[n] if iframes else None
+                # if iframe:
+                #     src = iframe.get_attribute('src')
+                #     if src:
+                #         browser.close()
+                #         return src
 
                 # Attempt to find og:video meta tag
                 og_video = page.query_selector('meta[property="og:video"]')
